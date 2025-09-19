@@ -12,12 +12,15 @@ import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import 'dotenv/config';
 import path from 'path';
 
+
+console.log(path.join(__dirname, "./migrations/*.+(js|ts)"));
+
 const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
     apiOptions: {
-        port: serverPort,
+        port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
         trustProxy: IS_DEV ? false : 1,
