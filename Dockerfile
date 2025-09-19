@@ -11,7 +11,17 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 COPY package.json yarn.lock ./
 
 # Install dependencies
+# Change this line in the builder stage (around line 11)
 RUN yarn --frozen-lockfile
+
+# To this:
+RUN yarn
+
+# And change this line in the runner stage (around line 32)
+RUN yarn install --frozen-lockfile --production
+
+# To this:
+RUN yarn install --production
 
 # Copy the rest of the application files
 COPY . .
