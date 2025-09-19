@@ -10,25 +10,16 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 # Copy only necessary files for dependencies
 COPY package.json yarn.lock ./
 
-# Install dependencies
-# Change this line in the builder stage (around line 11)
-RUN yarn --frozen-lockfile
-
-# To this:
+# Install dependencies including dev dependencies for build
 RUN yarn
-
-# And change this line in the runner stage (around line 32)
-RUN yarn install --frozen-lockfile --production
-
-# To this:
-RUN yarn install --production
 
 # Copy the rest of the application files
 COPY . .
 
-# Install necessary build tools and libraries
+# Install ts-node globally and other necessary build tools
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
+    npm install -g ts-node && \
     yarn build && \
     tar -czf build.tar.gz dist/ static/
 
@@ -47,7 +38,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Install production dependencies only
-RUN yarn install --frozen-lockfile --production
+RUN yarn install --production
 
 # Copy built application from builder stage
 COPY --from=builder /app/build.tar.gz ./
