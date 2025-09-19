@@ -5,8 +5,11 @@
   "scripts": {
     "dev:server": "ts-node ./src/index.ts",
     "dev:worker": "ts-node ./src/index-worker.ts",
-    "dev": "concurrently yarn:dev:*",
-    "build": "tsc",
+    "dev:admin-ui": "ts-node src/custom-admin-ui/compile-admin-ui.ts --dev --watch",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:admin-ui\"",
+    "build:admin-ui": "ts-node src/custom-admin-ui/compile-admin-ui.ts",
+    "build:admin-ui:dev": "ts-node src/custom-admin-ui/compile-admin-ui.ts --dev",
+    "build": "npm run build:admin-ui && tsc",
     "start:server": "node ./dist/index.js",
     "start:worker": "node ./dist/index-worker.js",
     "start": "concurrently yarn:start:*"

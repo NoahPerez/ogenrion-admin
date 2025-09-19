@@ -5,6 +5,7 @@ import {
     DefaultSearchPlugin,
     VendureConfig,
 } from '@vendure/core';
+import { customAdminUi } from "./custom-admin-ui/compile-admin-ui";
 import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
@@ -90,14 +91,21 @@ export const config: VendureConfig = {
                 changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
             },
         }),
-        AdminUiPlugin.init({
-          route: 'admin',
-          port: serverPort, // Use the same port as the server
-          adminUiConfig: {
-            apiHost: IS_DEV ? undefined : 'https://t0k0owwggwosc8kgokwsk00c.hostaa.ogerion.net',
-            apiPort: IS_DEV ? serverPort : 443, // Use 443 for HTTPS
-            adminApiPath: 'admin-api',
-          },
-        }),
+    AdminUiPlugin.init({
+      route: "admin",
+      app: customAdminUi({
+        devMode: IS_DEV,
+        recompile: IS_DEV,
+      }),
+      port: 3000,
+      adminUiConfig: {
+        apiHost: process.env.API_PUBLIC_URL,
+        apiPort: +(process.env.API_PUBLIC_PORT as string),
+        tokenMethod: "bearer",
+        brand: "Renue",
+        hideVendureBranding: false,
+        hideVersion: false,
+      },
+    }),
     ],
 };
