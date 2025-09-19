@@ -1,12 +1,58 @@
-FROM node:20
+# Builder Stage
+FROM --platform=linux/amd64 node:lts-slim AS builder
 
-# Install yarn globally
-RUN npm install -g yarn
+# Set working directory
+WORKDIR /app
 
-WORKDIR /usr/src/app
+# Increase network timeout and set HTTP version
+RUN yarn config set network-timeout 600000 && yarn config set network-http-version http1
 
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install --production --frozen-lockfile
+# Copy only necessary files for dependencies
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn --frozen-lockfile
+
+# Copy the rest of the application files
 COPY . .
-RUN yarn build
+
+# Install necessary build tools and libraries
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
+    yarn build && \
+    tar -czf build.tar.gz dist/ static/
+
+# Runner Stage
+FROM --platform=linux/amd64 node:lts-slim AS runner
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json yarn.lock ./
+
+# Install minimal dependencies and libraries
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
+    apt-get clean
+
+# Install production dependencies only
+RUN yarn install --frozen-lockfile --production
+
+# Copy built application from builder stage
+COPY --from=builder /app/build.tar.gz ./
+
+# Extract the build and clean up temporary files
+RUN tar -xzf build.tar.gz && \
+    rm build.tar.gz && \
+    rm -rf ~/.cache/* && \
+    rm -rf /usr/local/share/.cache/* && \
+    rm -rf /var/cache/apk/* && \
+    rm -rf /tmp/* && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
+
+# Expose application port
+EXPOSE 3000
+
+# Set default command
+CMD ["yarn", "start"]
