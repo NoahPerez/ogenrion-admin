@@ -1,5 +1,5 @@
 # Builder Stage
-FROM --platform=linux/amd64 node:lts-slim AS builder
+FROM node:lts-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN apt-get update && \
     tar -czf build.tar.gz dist/ static/
 
 # Runner Stage
-FROM --platform=linux/amd64 node:lts-slim AS runner
+FROM node:lts-slim AS runner
 
 # Set working directory
 WORKDIR /app
