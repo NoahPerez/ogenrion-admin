@@ -92,9 +92,11 @@ export const config: VendureConfig = {
         }),
         AdminUiPlugin.init({
             route: 'admin',
-            port: 3000,
+            port: serverPort, // Use the same port as the server
             adminUiConfig: {
-                apiPort: serverPort,
+                apiHost: IS_DEV ? undefined : 'https://t0k0owwggwosc8kgokwsk00c.hostaa.ogerion.net',
+                apiPort: IS_DEV ? serverPort : 443, // Use 443 for HTTPS
+                adminApiPath: 'admin-api',
             },
         }),
     ],
