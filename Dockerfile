@@ -1,5 +1,5 @@
 # Builder Stage
-FROM node:lts-slim AS builder
+FROM --platform=linux/amd64 node:lts-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -10,21 +10,20 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 # Copy only necessary files for dependencies
 COPY package.json yarn.lock ./
 
-# Install dependencies including dev dependencies for build
-RUN yarn
+# Install dependencies
+RUN yarn --frozen-lockfile
 
 # Copy the rest of the application files
 COPY . .
 
-# Install ts-node globally and other necessary build tools
+# Install necessary build tools and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
-    npm install -g ts-node && \
     yarn build && \
     tar -czf build.tar.gz dist/ static/
 
 # Runner Stage
-FROM node:lts-slim AS runner
+FROM --platform=linux/amd64 node:lts-slim AS runner
 
 # Set working directory
 WORKDIR /app
@@ -38,7 +37,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Install production dependencies only
-RUN yarn install --production
+RUN yarn install --frozen-lockfile --production
 
 # Copy built application from builder stage
 COPY --from=builder /app/build.tar.gz ./
