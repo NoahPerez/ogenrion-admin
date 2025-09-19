@@ -91,13 +91,13 @@ export const config: VendureConfig = {
             },
         }),
         AdminUiPlugin.init({
-            route: 'admin',
-            port: serverPort, // Use the same port as the server
-            adminUiConfig: {
-                apiHost: IS_DEV ? undefined : 'https://t0k0owwggwosc8kgokwsk00c.hostaa.ogerion.net',
-                apiPort: IS_DEV ? serverPort : 443, // Use 443 for HTTPS
-                adminApiPath: 'admin-api',
-            },
+          route: 'admin',
+          port: serverPort, // Use the same port as the server
+          adminUiConfig: {
+            apiHost: IS_DEV ? undefined : 'https://t0k0owwggwosc8kgokwsk00c.hostaa.ogerion.net',
+            apiPort: IS_DEV ? serverPort : 443, // Use 443 for HTTPS
+            adminApiPath: 'admin-api',
+          },
         }),
     ],
 };
