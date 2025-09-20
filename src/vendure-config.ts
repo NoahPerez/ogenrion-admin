@@ -47,7 +47,7 @@ export const config: VendureConfig = {
         connectTimeoutMS: 10000,
         // See the README.md "Migrations" section for an explanation of
         // the `synchronize` and `migrations` options.
-        synchronize: true,  // Change this to true for new database
+        synchronize: false,  // Change this to true for new database
         // Completely remove migrations for now
         logging: false,
         database: process.env.DB_NAME,
