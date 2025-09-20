@@ -102,7 +102,7 @@ export const config: VendureConfig = {
         apiHost: process.env.API_PUBLIC_URL,
         apiPort: +(process.env.API_PUBLIC_PORT as string),
         tokenMethod: "bearer",
-        brand: "Renue",
+        brand: "Origerio",
         hideVendureBranding: false,
         hideVersion: false,
       },

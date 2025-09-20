@@ -10,8 +10,8 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 # Copy only necessary files for dependencies
 COPY package.json yarn.lock ./
 
-# Install dependencies including ts-node
-RUN yarn install && npm install -g ts-node
+# Install dependencies
+RUN yarn --frozen-lockfile
 
 # Copy the rest of the application files
 COPY . .
@@ -19,10 +19,14 @@ COPY . .
 # Install necessary build tools and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
-    yarn build:admin-ui && \
+    # Compile the admin UI first
+    ts-node src/custom-admin-ui/compile-admin-ui.ts && \
+    # Then run the main build
     yarn build && \
+    # Make sure admin UI is in the right place
     mkdir -p dist/custom-admin-ui && \
     cp -r src/custom-admin-ui/admin-ui dist/custom-admin-ui/ && \
+    # Create the archive
     tar -czf build.tar.gz dist/ static/
 
 # Runner Stage
@@ -40,7 +44,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Install production dependencies only
-RUN yarn install --production
+RUN yarn install --frozen-lockfile --production
 
 # Copy built application from builder stage
 COPY --from=builder /app/build.tar.gz ./
@@ -53,6 +57,9 @@ RUN tar -xzf build.tar.gz && \
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
+
+# Set environment variable for admin UI path
+ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui/dist/browser
 
 # Expose application port
 EXPOSE 3000
