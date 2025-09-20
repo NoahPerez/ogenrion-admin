@@ -26,11 +26,8 @@ RUN apt-get update && \
     ts-node src/custom-admin-ui/compile-admin-ui.ts && \
     # Then run the main build
     yarn build && \
-    # Make sure admin UI is in the right place
-    mkdir -p dist/custom-admin-ui && \
-    cp -r src/custom-admin-ui/admin-ui dist/custom-admin-ui/ && \
-    # Create the archive
-    tar -czf build.tar.gz dist/ static/
+    # Create the archive - include the admin-ui directory
+    tar -czf build.tar.gz dist/ static/ src/custom-admin-ui/admin-ui/
 
 # Runner Stage
 FROM --platform=linux/amd64 node:lts-slim AS runner
@@ -45,8 +42,10 @@ COPY package.json yarn.lock ./
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
     apt-get clean
-# Install production dependencies only
-RUN yarn install --frozen-lockfile --production
+
+# Install production dependencies and global packages needed for runtime
+RUN yarn install --frozen-lockfile --production && \
+    npm install -g concurrently
 
 # Copy built application from builder stage
 COPY --from=builder /app/build.tar.gz ./
@@ -60,11 +59,11 @@ RUN tar -xzf build.tar.gz && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
-# Set environment variable for admin UI path
-ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui/dist/browser
+# Set environment variable for admin UI path - point to the correct location
+ENV ADMIN_UI_PATH=/app/src/custom-admin-ui/admin-ui
 
 # Expose application port
 EXPOSE 3000
 
-# Set default command
+# Start the application
 CMD ["yarn", "start"]
