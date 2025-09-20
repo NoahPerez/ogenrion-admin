@@ -10,8 +10,8 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 # Copy only necessary files for dependencies
 COPY package.json yarn.lock ./
 
-# Install dependencies
-RUN yarn --frozen-lockfile
+# Install dependencies including ts-node
+RUN yarn install && npm install -g ts-node
 
 # Copy the rest of the application files
 COPY . .
@@ -19,7 +19,10 @@ COPY . .
 # Install necessary build tools and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
+    yarn build:admin-ui && \
     yarn build && \
+    mkdir -p dist/custom-admin-ui && \
+    cp -r src/custom-admin-ui/admin-ui dist/custom-admin-ui/ && \
     tar -czf build.tar.gz dist/ static/
 
 # Runner Stage
@@ -37,7 +40,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Install production dependencies only
-RUN yarn install --frozen-lockfile --production
+RUN yarn install --production
 
 # Copy built application from builder stage
 COPY --from=builder /app/build.tar.gz ./
