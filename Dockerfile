@@ -16,6 +16,9 @@ RUN yarn --frozen-lockfile && npm install -g ts-node typescript @angular/cli
 # Copy the rest of the application files
 COPY . .
 
+# Create the missing build.sh script
+RUN echo '#!/bin/sh\nnpx tsc -p tsconfig.build.json' > build.sh && chmod +x build.sh
+
 # Install necessary build tools and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
