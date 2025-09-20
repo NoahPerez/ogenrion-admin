@@ -42,7 +42,6 @@ COPY package.json yarn.lock ./
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
     apt-get clean
-
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production
 
