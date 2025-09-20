@@ -19,19 +19,36 @@ COPY . .
 # Create the missing build.sh script
 RUN echo '#!/bin/sh\nnpx tsc -p tsconfig.build.json' > build.sh && chmod +x build.sh
 
-# Install necessary build tools and libraries
+# Install necessary build tools and libraries, compile admin UI, and build application
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
-    # Compile the admin UI first
+    # Compile the admin UI first (creates source files)
     echo "Compiling custom admin UI..." && \
     ts-node src/custom-admin-ui/compile-admin-ui.ts && \
     echo "Admin UI compilation completed" && \
-    # Verify the admin UI was created
-    ls -la src/custom-admin-ui/ && \
-    # Then run the main build
+    # Build the Angular admin UI (creates production files)
+    echo "Building Angular admin UI..." && \
+    cd src/custom-admin-ui/admin-ui && \
+    npm install && \
+    ng build --configuration production && \
+    echo "Angular build completed" && \
+    cd /app && \
+    # Verify the Angular build created the expected files
+    echo "Verifying Angular build output..." && \
+    ls -la src/custom-admin-ui/admin-ui/dist/ && \
+    ls -la src/custom-admin-ui/admin-ui/dist/browser/ && \
+    find src/custom-admin-ui/admin-ui/dist/browser/ -name "vendure-ui-config.json" -type f && \
+    # Run the main application build
     yarn build && \
-    # Create the archive
-    tar -czf build.tar.gz dist/ static/ src/custom-admin-ui/admin-ui/
+    # Copy admin UI built files to dist for easier access
+    mkdir -p dist/custom-admin-ui/admin-ui && \
+    cp -r src/custom-admin-ui/admin-ui/dist/browser/* dist/custom-admin-ui/admin-ui/ && \
+    # Verify the copy was successful
+    echo "Verifying admin UI files in final location..." && \
+    ls -la dist/custom-admin-ui/admin-ui/ && \
+    find dist/custom-admin-ui/admin-ui/ -name "vendure-ui-config.json" -type f && \
+    # Create the build archive
+    tar -czf build.tar.gz dist/ static/
 
 # Runner Stage
 FROM --platform=linux/amd64 node:lts-slim AS runner
@@ -58,13 +75,18 @@ COPY --from=builder /app/build.tar.gz ./
 RUN tar -xzf build.tar.gz && \
     rm build.tar.gz && \
     # Verify admin UI files are present
-    echo "Checking admin UI files:" && \
-    ls -la src/custom-admin-ui/ && \
+    echo "Checking admin UI files in runner stage:" && \
+    ls -la dist/custom-admin-ui/admin-ui/ && \
+    find dist/custom-admin-ui/admin-ui/ -name "vendure-ui-config.json" -type f && \
+    # Clean up caches
     rm -rf ~/.cache/* && \
     rm -rf /usr/local/share/.cache/* && \
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
+
+# Set the admin UI path environment variable
+ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui
 
 # Expose application port
 EXPOSE 3000
