@@ -40,13 +40,15 @@ RUN apt-get update && \
     find src/custom-admin-ui/admin-ui/dist/browser/ -name "vendure-ui-config.json" -type f && \
     # Run the main application build
     yarn build && \
-    # Copy admin UI built files to dist for easier access
+    # Copy admin UI maintaining the dist/browser structure
     mkdir -p dist/custom-admin-ui/admin-ui && \
-    cp -r src/custom-admin-ui/admin-ui/dist/browser/* dist/custom-admin-ui/admin-ui/ && \
-    # Verify the copy was successful
+    cp -r src/custom-admin-ui/admin-ui/dist dist/custom-admin-ui/admin-ui/ && \
+    # Verify the copy was successful with correct structure
     echo "Verifying admin UI files in final location..." && \
     ls -la dist/custom-admin-ui/admin-ui/ && \
-    find dist/custom-admin-ui/admin-ui/ -name "vendure-ui-config.json" -type f && \
+    ls -la dist/custom-admin-ui/admin-ui/dist/ && \
+    ls -la dist/custom-admin-ui/admin-ui/dist/browser/ && \
+    find dist/custom-admin-ui/admin-ui/dist/browser/ -name "vendure-ui-config.json" -type f && \
     # Create the build archive
     tar -czf build.tar.gz dist/ static/
 
@@ -74,10 +76,12 @@ COPY --from=builder /app/build.tar.gz ./
 # Extract the build and clean up temporary files
 RUN tar -xzf build.tar.gz && \
     rm build.tar.gz && \
-    # Verify admin UI files are present
+    # Verify admin UI files are present with correct structure
     echo "Checking admin UI files in runner stage:" && \
     ls -la dist/custom-admin-ui/admin-ui/ && \
-    find dist/custom-admin-ui/admin-ui/ -name "vendure-ui-config.json" -type f && \
+    ls -la dist/custom-admin-ui/admin-ui/dist/ && \
+    ls -la dist/custom-admin-ui/admin-ui/dist/browser/ && \
+    find dist/custom-admin-ui/admin-ui/dist/browser/ -name "vendure-ui-config.json" -type f && \
     # Clean up caches
     rm -rf ~/.cache/* && \
     rm -rf /usr/local/share/.cache/* && \
@@ -85,7 +89,7 @@ RUN tar -xzf build.tar.gz && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
-# Set the admin UI path environment variable
+# Set the admin UI path environment variable to point to the directory containing dist/browser
 ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui
 
 # Expose application port
