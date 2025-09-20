@@ -63,5 +63,6 @@ ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui/dist/browser
 # Expose application port
 EXPOSE 3000
 
+
 # Set default command
 CMD ["yarn", "start"]

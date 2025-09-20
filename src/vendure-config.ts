@@ -97,7 +97,7 @@ export const config: VendureConfig = {
         devMode: IS_DEV,
         recompile: IS_DEV,
       }),
-      port: 3000,
+      port: 3002,
       adminUiConfig: {
         apiHost: process.env.API_PUBLIC_URL,
         apiPort: +(process.env.API_PUBLIC_PORT as string),
