@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
@@ -18,9 +17,11 @@
     "node_modules",
     "migration.ts",
     "src/plugins/**/ui/*",
-    "src/plugins/**/dashboard/*",
-    "admin-ui",
-    "vite.*.*ts"
+    "src/custom-admin-ui/admin-ui"
+  ],
+  "include": [
+    "src/**/*",
+    "**/*.tsx"
   ],
   "ts-node": {
     "files": true
