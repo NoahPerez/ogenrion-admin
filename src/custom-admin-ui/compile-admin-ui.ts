@@ -64,7 +64,7 @@ export function customAdminUi(options: {
       devMode: options.devMode,
     });
   } else {
-    // Return the path to the admin UI - use environment variable or fallback to built files
+    // Return the path to the admin UI - use environment variable directly
     return {
       path: process.env.ADMIN_UI_PATH || path.join(__dirname, "./admin-ui/dist/browser"),
     };

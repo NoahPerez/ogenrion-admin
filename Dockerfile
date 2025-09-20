@@ -40,7 +40,7 @@ RUN apt-get update && \
     find src/custom-admin-ui/admin-ui/dist/browser/ -name "vendure-ui-config.json" -type f && \
     # Run the main application build
     yarn build && \
-    # Copy admin UI files to the expected location
+    # Copy admin UI files to the expected location - copy contents directly
     mkdir -p dist/custom-admin-ui/admin-ui && \
     cp -r src/custom-admin-ui/admin-ui/dist/browser/* dist/custom-admin-ui/admin-ui/ && \
     # Verify the copy was successful
@@ -85,7 +85,7 @@ RUN tar -xzf build.tar.gz && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
-# Set the admin UI path environment variable to point to where vendure-ui-config.json is located
+# Set the admin UI path environment variable to point directly to where vendure-ui-config.json is located
 ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui
 
 # Expose application port
