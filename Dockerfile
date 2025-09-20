@@ -10,8 +10,8 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 # Copy only necessary files for dependencies
 COPY package.json yarn.lock ./
 
-# Install dependencies
-RUN yarn --frozen-lockfile
+# Install dependencies and ts-node globally
+RUN yarn --frozen-lockfile && npm install -g ts-node typescript
 
 # Copy the rest of the application files
 COPY . .
