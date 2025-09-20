@@ -65,7 +65,7 @@ export function customAdminUi(options: {
     return {
       path:
         process.env.ADMIN_UI_PATH ||
-        path.join(__dirname, "./admin-ui/dist/browser"),
+        path.join(__dirname, "admin-ui/dist/browser"),
     };
   }
 }

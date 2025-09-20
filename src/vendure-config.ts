@@ -91,21 +91,21 @@ export const config: VendureConfig = {
                 changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
             },
         }),
-    AdminUiPlugin.init({
-      route: "admin",
-      app: customAdminUi({
-        devMode: IS_DEV,
-        recompile: IS_DEV,
-      }),
-      port: 3002,
-      adminUiConfig: {
-        apiHost: process.env.API_PUBLIC_URL,
-        apiPort: +(process.env.API_PUBLIC_PORT as string),
-        tokenMethod: "bearer",
-        brand: "Origerio",
-        hideVendureBranding: false,
-        hideVersion: false,
-      },
-    }),
+        AdminUiPlugin.init({
+          route: "admin",
+          app: customAdminUi({
+            devMode: IS_DEV,
+            recompile: IS_DEV,
+          }),
+          port: 3000,
+          adminUiConfig: {
+            apiHost: process.env.API_PUBLIC_URL,
+            apiPort: +(process.env.API_PUBLIC_PORT as string),
+            tokenMethod: "bearer",
+            brand: "Origerio",
+            hideVendureBranding: false,
+            hideVersion: false,
+          },
+        }),
     ],
 };

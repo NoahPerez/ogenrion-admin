@@ -26,8 +26,11 @@ RUN apt-get update && \
     ts-node src/custom-admin-ui/compile-admin-ui.ts && \
     # Then run the main build
     yarn build && \
-    # Create the archive - include the admin-ui directory
-    tar -czf build.tar.gz dist/ static/ src/custom-admin-ui/admin-ui/
+    # Make sure admin UI is in the right place
+    mkdir -p dist/custom-admin-ui/admin-ui/dist/browser && \
+    cp -r src/custom-admin-ui/admin-ui/dist/browser/* dist/custom-admin-ui/admin-ui/dist/browser/ && \
+    # Create the archive
+    tar -czf build.tar.gz dist/ static/
 
 # Runner Stage
 FROM --platform=linux/amd64 node:lts-slim AS runner
@@ -60,7 +63,7 @@ RUN tar -xzf build.tar.gz && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
 # Set environment variable for admin UI path - point to the correct location
-ENV ADMIN_UI_PATH=/app/src/custom-admin-ui/admin-ui
+ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui/dist/browser
 
 # Expose application port
 EXPOSE 3000
