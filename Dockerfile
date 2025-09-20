@@ -11,7 +11,7 @@ RUN yarn config set network-timeout 600000 && yarn config set network-http-versi
 COPY package.json yarn.lock ./
 
 # Install dependencies and ts-node globally
-RUN yarn --frozen-lockfile && npm install -g ts-node typescript
+RUN yarn --frozen-lockfile && npm install -g ts-node typescript @angular/cli
 
 # Copy the rest of the application files
 COPY . .
@@ -62,7 +62,6 @@ ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui/dist/browser
 
 # Expose application port
 EXPOSE 3000
-
 
 # Set default command
 CMD ["yarn", "start"]
