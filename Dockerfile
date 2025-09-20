@@ -22,15 +22,12 @@ RUN echo '#!/bin/sh\nnpx tsc -p tsconfig.build.json' > build.sh && chmod +x buil
 # Install necessary build tools and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
-    # Compile the admin UI first
-    ts-node src/custom-admin-ui/compile-admin-ui.ts && \
+    # Compile the admin UI first - force recompile
+    ts-node -e "require('./src/custom-admin-ui/compile-admin-ui').customAdminUi({recompile: true, devMode: false}).compile().then(() => console.log('Admin UI compiled successfully'))" && \
     # Then run the main build
     yarn build && \
-    # Make sure admin UI is in the right place
-    mkdir -p dist/custom-admin-ui/admin-ui/dist/browser && \
-    cp -r src/custom-admin-ui/admin-ui/dist/browser/* dist/custom-admin-ui/admin-ui/dist/browser/ && \
-    # Create the archive
-    tar -czf build.tar.gz dist/ static/
+    # Create the archive - include the admin-ui directory
+    tar -czf build.tar.gz dist/ static/ src/custom-admin-ui/admin-ui/
 
 # Runner Stage
 FROM --platform=linux/amd64 node:lts-slim AS runner
@@ -63,7 +60,7 @@ RUN tar -xzf build.tar.gz && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
 # Set environment variable for admin UI path - point to the correct location
-ENV ADMIN_UI_PATH=/app/dist/custom-admin-ui/admin-ui/dist/browser
+ENV ADMIN_UI_PATH=/app/src/custom-admin-ui/admin-ui
 
 # Expose application port
 EXPOSE 3000
