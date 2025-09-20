@@ -22,6 +22,7 @@
     "@vendure/core": "3.4.2",
     "@vendure/email-plugin": "3.4.2",
     "@vendure/graphiql-plugin": "3.4.2",
+    "@vendure/ui-devkit": "3.4.2",
     "concurrently": "9.2.1",
     "dotenv": "17.2.2",
     "pg": "8.16.3"
@@ -30,7 +31,6 @@
     "@angular-devkit/core": "^19.2.17",
     "@angular/cli": "^19.2.17",
     "@vendure/cli": "3.4.2",
-    "@vendure/ui-devkit": "3.4.2",
     "typescript": "5.8.2"
   }
 }
