@@ -99,8 +99,8 @@ export const config: VendureConfig = {
           }),
           port: 3002,
           adminUiConfig: {
-            apiHost: process.env.API_PUBLIC_URL,
-            apiPort: +(process.env.API_PUBLIC_PORT as string),
+            apiHost: process.env.API_PUBLIC_URL || 'auto',
+            apiPort: process.env.API_PUBLIC_PORT ? +process.env.API_PUBLIC_PORT : 'auto',
             tokenMethod: "bearer",
             brand: "Origerio",
             hideVendureBranding: false,
