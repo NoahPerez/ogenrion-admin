@@ -22,11 +22,15 @@ RUN echo '#!/bin/sh\nnpx tsc -p tsconfig.build.json' > build.sh && chmod +x buil
 # Install necessary build tools and libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential chrpath libssl-dev libxft-dev libfreetype6 libfontconfig1 && \
-    # Compile the admin UI first - force recompile
-    ts-node -e "require('./src/custom-admin-ui/compile-admin-ui').customAdminUi({recompile: true, devMode: false}).compile().then(() => console.log('Admin UI compiled successfully'))" && \
+    # Compile the admin UI first
+    echo "Compiling custom admin UI..." && \
+    ts-node src/custom-admin-ui/compile-admin-ui.ts && \
+    echo "Admin UI compilation completed" && \
+    # Verify the admin UI was created
+    ls -la src/custom-admin-ui/ && \
     # Then run the main build
     yarn build && \
-    # Create the archive - include the admin-ui directory
+    # Create the archive
     tar -czf build.tar.gz dist/ static/ src/custom-admin-ui/admin-ui/
 
 # Runner Stage
@@ -53,14 +57,14 @@ COPY --from=builder /app/build.tar.gz ./
 # Extract the build and clean up temporary files
 RUN tar -xzf build.tar.gz && \
     rm build.tar.gz && \
+    # Verify admin UI files are present
+    echo "Checking admin UI files:" && \
+    ls -la src/custom-admin-ui/ && \
     rm -rf ~/.cache/* && \
     rm -rf /usr/local/share/.cache/* && \
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
-
-# Set environment variable for admin UI path - point to the correct location
-ENV ADMIN_UI_PATH=/app/src/custom-admin-ui/admin-ui
 
 # Expose application port
 EXPOSE 3000

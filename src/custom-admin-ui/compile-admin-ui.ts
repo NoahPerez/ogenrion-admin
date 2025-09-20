@@ -10,7 +10,12 @@ if (require.main === module) {
   customAdminUi({ recompile: true, devMode: false })
     .compile?.()
     .then(() => {
+      console.log('Admin UI compilation completed successfully');
       process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Admin UI compilation failed:', error);
+      process.exit(1);
     });
 }
 
@@ -26,31 +31,29 @@ export function customAdminUi(options: {
       extensions: [
         // 1. Set custom branding
         setBranding({
-          //   faviconPath: path.join(__dirname, "favicon.ico"),
-          //  largeLogoPath: path.join(__dirname, "logo-large.png"),
-          // Commenting out the smallLogoPath to avoid the error
+          // You can uncomment and add these when you have the files
+          // faviconPath: path.join(__dirname, "favicon.ico"),
+          // largeLogoPath: path.join(__dirname, "logo-large.png"),
           // smallLogoPath: path.join(__dirname, "logo-small.png"),
         }),
         
         // 2. Add translations
         {
           translations: {
+            // You can add translation files here when needed
             // en: path.join(__dirname, "en.json"),
             // es: path.join(__dirname, "es.json"),
-            // Add more languages as needed
           },
         },
         
         // 3. Add global styles and static assets
         {
-          // Comment out globalStyles to avoid the error
+          // You can add custom styles when needed
           // globalStyles: path.join(__dirname, "styles.scss"),
           staticAssets: [
+            // Add static assets here when needed
             // path.join(__dirname, "logo-large.png"),
-            // Commenting out the logo-small.png reference to avoid the error
             // path.join(__dirname, "logo-small.png"),
-            // path.join(__dirname, "icons/info.svg"),
-            // Add more static assets as needed
           ],
         },
         
@@ -63,9 +66,7 @@ export function customAdminUi(options: {
   } else {
     // Return the path to the compiled admin UI
     return {
-      path:
-        process.env.ADMIN_UI_PATH ||
-        path.join(__dirname, "admin-ui/dist/browser"),
+      path: path.join(__dirname, "admin-ui"),
     };
   }
 }
